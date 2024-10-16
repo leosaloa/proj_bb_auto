@@ -4,8 +4,8 @@ import datetime
 import string
 
 # Mapeamento pasta e importação do arquivo
-origem = r'C://projetos//bb_auto//processar//'
-destino = r'C://projetos//bb_auto//processado//'
+origem = r'C://projetos//projeto//processar//'
+destino = r'C://projetos//projeto//processado//'
 
 if not os.path.exists(origem):
     os.makedirs(origem)
@@ -26,17 +26,17 @@ alfabeto = string.ascii_letters
 #nao_alfabeto = ''.join(char for char in todos_caracteres if )#####
 
 # Trata base
-df['APOLICE'] = df['APOLICE'].astype(str)
+df['CADASTRO'] = df['CADASTRO'].astype(str)
 df['DT_EMISSAO'] = df['DT_EMISSAO'].dt.strftime('%d/%m/%Y')
 df['VIGENCIA_INICIO'] = df['VIGENCIA_INICIO'].dt.strftime('%d/%m/%Y')
 df['VIGENCIA_FIM'] = df['VIGENCIA_FIM'].dt.strftime('%d/%m/%Y')
-df['Soma de VL_PARCELA'] = df['Soma de VL_PARCELA'].apply(lambda x: f'{x:.2f}'.replace('.', ','))
-df['Soma de VL_PARCELA'] = df['Soma de VL_PARCELA'].astype(str)
+df['VL_PARCELA'] = df['VL_PARCELA'].apply(lambda x: f'{x:.2f}'.replace('.', ','))
+df['VL_PARCELA'] = df['VL_PARCELA'].astype(str)
 df['DDD'] = df['DDD DO TOMADOR'].fillna(0).astype(int).astype(str)
 df['DDD'] = df['DDD'].replace('0', '')
-df['TEL COMPLETO2'] = df['TELEFONE DO TOMADOR'].fillna(0).astype('Int64').astype(str)
-df['TEL COMPLETO2'] = '55' + df['DDD'] + df['TEL COMPLETO2']
-df['NUM_CARACT'] = df.apply(lambda x: len(x['TEL COMPLETO2']), axis=1)
+df['TELEFONE COMPLETO'] = df['TELEFONE'].fillna(0).astype('Int64').astype(str)
+df['TELEFONE COMPLETO'] = '55' + df['DDD'] + df['TELEFONE COMPLETO']
+df['NUM_CARACT'] = df.apply(lambda x: len(x['TELEFONE COMPLETO']), axis=1)
 df['ATRASO'] = (dt_atual - df['VENCTO_PARCELA']).dt.days
 df['VENCTO_PARCELA'] = df['VENCTO_PARCELA'].dt.strftime('%d/%m/%Y')
 df['DOC_TOMADOR'] = df['DOC_TOMADOR'].astype(str)
@@ -45,7 +45,7 @@ df['NOME'] = df.apply(lambda x: x['NOME_TOMADOR'].split(' ')[0], axis=1)
 df['QTD_TOTAL_PARCELAS'] = df['QTD_TOTAL_PARCELAS'].fillna(0).astype(int).astype(str)
 df['QTD_TOTAL_PARCELAS'] = df['QTD_TOTAL_PARCELAS'].replace('0', '')
 df['DDD DO TOMADOR'] = df['DDD DO TOMADOR'].fillna(0).astype(int).astype(str)
-df['TELEFONE DO TOMADOR'] = df['TELEFONE DO TOMADOR'].fillna(0).astype(int).astype(str)
+df['TELEFONE'] = df['TELEFONE'].fillna(0).astype(int).astype(str)
 # Fim tratamento da base
 
 # DDD RIO GRANDE DO SUL
@@ -55,30 +55,30 @@ df['DDD_SUL'] = ((df['DDD'] == '51')
                  | (df['DDD'] == '55')
                  )
 
-df_bb_auto = df
+df_projeto = df
 df_bot_bb = df
 
-# Filtrar base BB_AUTO
-df_bb_auto = df_bb_auto[(df_bb_auto['PARCELA'] != 1)
-                        & (df_bb_auto['SITUACAO'] == 'RE')
-                        & (df_bb_auto['TIPO'] == 'DB')
-                        & ((df_bb_auto['ATRASO'] == 2) | (df['ATRASO'] == 6))
-                        & (df_bb_auto['NUM_CARACT'] == 13)
-                        #& (df_bb_auto['DDD_SUL'] == False)  # RETIRAR ASSIM QUE VOLTAR A COBRAR O RS
+# Filtrar base projeto
+df_projeto = df_projeto[(df_projeto['PARCELA'] != 1)
+                        & (df_projeto['SITUACAO'] == 'RE')
+                        & (df_projeto['TIPO'] == 'DB')
+                        & ((df_projeto['ATRASO'] == 2) | (df['ATRASO'] == 6))
+                        & (df_projeto['NUM_CARACT'] == 13)
+                        #& (df_projeto['DDD_SUL'] == False)  # RETIRAR ASSIM QUE VOLTAR A COBRAR O RS
                         ]
 
-# Layout do arquivo BB_AUTO
-colunas_bb_auto = {
+# Layout do arquivo projeto
+colunas_projeto = {
     'DOC_TOMADOR': 'ID',
-    'TEL COMPLETO2': 'TELEFONE',
+    'TELEFONE COMPLETO': 'TELEFONE',
     'NOME_TOMADOR': 'NOME',
     'DOC_TOMADOR2': 'CPF',
     'NOME': 'nome_cliente',
-    'APOLICE': 'apolice',
+    'CADASTRO': 'CADASTRO',
     'ENDOSSO': 'endosso',
     'PARCELA': 'numero_parcela',
     'VENCTO_PARCELA': 'vencimento',
-    'Soma de VL_PARCELA': 'valor',
+    'VL_PARCELA': 'valor',
 }
 
 # -----------------------------------------------------------------------#
@@ -101,7 +101,7 @@ df_bot_bb = df_bot_bb[(df_bot_bb['PARCELA'] != 1)
 
 colunas_bot_bb = {'RAMO': 'RAMO',
                   'PRODUTO': 'PRODUTO',
-                  'APOLICE': 'APOLICE',
+                  'CADASTRO': 'CADASTRO',
                   'ENDOSSO': 'ENDOSSO',
                   'PROVISORIO': 'PROVISORIO',
                   'Coluna3': 'Coluna3',
@@ -119,7 +119,7 @@ colunas_bot_bb = {'RAMO': 'RAMO',
                   'USER_EMISSAO': 'USER_EMISSAO',
                   'VIGENCIA_INICIO': 'VIGENCIA_INICIO',
                   'VIGENCIA_FIM': 'VIGENCIA_FIM',
-                  'Soma de VL_PARCELA': 'Soma de VL_PARCELA',
+                  'VL_PARCELA': 'VL_PARCELA',
                   'VENCTO_PARCELA': 'VENCTO_PARCELA',
                   'VENCTO_PARCELA88': 'VENCTO_PARCELA88',
                   'VENCTO_PARCELA883': 'VENCTO_PARCELA883',
@@ -134,7 +134,7 @@ colunas_bot_bb = {'RAMO': 'RAMO',
                   'DOC_TOMADOR': 'DOC_TOMADOR',
                   'NOME_TOMADOR': 'NOME_TOMADOR',
                   'DDD DO TOMADOR': 'DDD DO TOMADOR',
-                  'TELEFONE DO TOMADOR': 'TELEFONE DO TOMADOR',
+                  'TELEFONE': 'TELEFONE',
                   'E-MAIL1 DO TOMADOR': 'E-MAIL1 DO TOMADOR',
                   'QTD_REPROGRAMACOES': 'QTD_REPROGRAMACOES',
                   'DT_VENCTO_REPROG': 'DT_VENCTO_REPROG',
@@ -157,17 +157,17 @@ colunas_bot_bb = {'RAMO': 'RAMO',
 #---------------------------------------------------#
 
 ##### EXTRAÇÃO #####
-# BB_AUTO
-df_bb_auto = df_bb_auto.rename(columns=colunas_bb_auto)[list(colunas_bb_auto.values())]
+# projeto
+df_projeto = df_projeto.rename(columns=colunas_projeto)[list(colunas_projeto.values())]
 # 10% DA BASE
-df_bb_auto_10 = df_bb_auto.sample(frac=0.1, random_state=1) #
-df_bb_auto_10.to_excel(f'{destino}AUTO_BB_DB_D2_6_{arquivos[0].split("_")[4]}', index=False) #
+df_projeto_10 = df_projeto.sample(frac=0.1, random_state=1) #
+df_projeto_10.to_excel(f'{destino}AUTO_BB_DB_D2_6_{arquivos[0].split("_")[4]}', index=False) #
 
 # BASE COMPLETA
-#df_bb_auto.to_excel(f'{destino}AUTO_BB_DB_D2_6_{arquivos[0].split("_")[4]}', index=False)
-print('Extração BB_AUTO FINALIZADA!')
+#df_projeto.to_excel(f'{destino}AUTO_BB_DB_D2_6_{arquivos[0].split("_")[4]}', index=False)
+print('Extração projeto FINALIZADA!')
 
-# BOT_BB_AUTO
+# BOT_projeto
 df_bot_bb = df_bot_bb.rename(columns=colunas_bot_bb)[list(colunas_bot_bb.values())]
 # 10% DA BASE
 df_bot_bb_10 = df_bot_bb.sample(frac=0.1, random_state=1)#
@@ -175,6 +175,6 @@ df_bot_bb_10.to_csv(f'{destino}BASE BB - {arquivos[0].split("_")[4].replace("xls
 
 # BASE COMPLETA
 #df_bot_bb.to_csv(f'{destino}BASE BB - {arquivos[0].split("_")[4].replace("xlsx", "csv")}', sep=';', index=False)
-print('Extração BOT_BB_AUTO FINALIZADA!')
+print('Extração BOT_projeto FINALIZADA!')
 dt_fim = datetime.datetime.now()
 print(f'Tempo de execução: {dt_fim - dt_atual}')
